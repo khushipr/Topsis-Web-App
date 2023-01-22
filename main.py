@@ -97,6 +97,17 @@ def topsis(inputFileName, weights, impacts):
 
     return mat
 
+st.set_page_config(layout='centered', page_title='Topsis Calculator')
+st.write('<style>div.block-container{padding-top:2rem;}</style>', unsafe_allow_html=True)
+st.header("Topsis Calculator for MCDM")
+hide_streamlit_style = """
+            <style>
+            #MainMenu {visibility: hidden;}
+            footer:before {content: 'Made by Khushi Prasad'; display:block; position:relative;color:tomato;}
+            footer {visibility: visible;}
+            </style>
+            """
+st.markdown(hide_streamlit_style, unsafe_allow_html=True) 
 with st.form("form1", clear_on_submit=True):
     inputFileName = st.file_uploader("Input File Name")
     weights = st.text_input("Weights")
@@ -136,8 +147,7 @@ if submit is True:
             server.starttls()
             try:
                 server.login(sender, password)
-                print("Logged In..")
                 server.send_message(msg)
-                print("Email Sent!")
+                st.write("Email Sent Successfully!")
             except smtplib.SMTPAuthenticationError:
                 print("Unable to sign in")
