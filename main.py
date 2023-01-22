@@ -112,8 +112,16 @@ with st.form("form1", clear_on_submit=True):
     inputFileName = st.file_uploader("Input File Name")
     weights = st.text_input("Weights")
     impacts = st.text_input("Impacts")
-    email = st.text_input("Email ID")
+    email = st.text_input("Email ID", placeholder='kprasad_be20@thapar.edu')
     submit = st.form_submit_button("Submit")
+
+def checkFormat(w):
+    for i in range(1, len(w), 2):
+        if w[i] == ',':
+            continue
+        else:
+            return False
+    return True
 
 subject = "Results"
 msg = EmailMessage()
@@ -122,32 +130,53 @@ msg['From'] = sender
 msg['To'] = email
 filename = "results.csv"
 if submit is True:
-    weights = weights.split(',')
-    for i in range(0, len(weights)):
-            weights[i] = int(weights[i])
-    impacts = impacts.split(',')
-    csvfile = topsis(inputFileName ,weights, impacts)       
+    if(len(weights)==len(impacts)):
+        weights = weights.split(',') if checkFormat(weights) == True else None
+        if weights != None:
+            for i in range(0, len(weights)):
+                weights[i] = int(weights[i])
+        else:
+            st.write("Weights are not comma separated!")
+            exit()
+        impacts = impacts.split(',') if checkFormat(impacts) == True else None
 
-    with open(filename, 'w') as csvfiles: 
-        # creating a csv writer object 
-        csvwriter = csv.writer(csvfiles) 
-            
-        # writing the fields 
-        csvwriter.writerow(list(csvfile.columns)) 
-            
-        # writing the data rows 
-        file_data = csvwriter.writerows(list(csvfile.values.tolist()))
-    
-    with open(filename,"rb") as f:
-            file_data = f.read()
-            file_name = f.name
-            msg.add_attachment(file_data,maintype="application",subtype="csv",filename=file_name)
+        count = 0
+        if impacts != None:
+            for i in range(0, len(impacts)):
+                if(impacts[i]=='+' or impacts[i]=='-'):
+                    count = count+1
+            if count==len(impacts):
+                pass
+            else:
+                st.write("Impacts must be +ve or -ve!")
+                exit()
+        else:
+            st.write("Impacts are not comma separated!")
+            exit()
+        csvfile = topsis(inputFileName ,weights, impacts)       
 
-            server = smtplib.SMTP('smtp.gmail.com', 587)
-            server.starttls()
-            try:
-                server.login(sender, password)
-                server.send_message(msg)
-                st.write("Email Sent Successfully!")
-            except smtplib.SMTPAuthenticationError:
-                print("Unable to sign in")
+        with open(filename, 'w') as csvfiles: 
+            # creating a csv writer object 
+            csvwriter = csv.writer(csvfiles) 
+                
+            # writing the fields 
+            csvwriter.writerow(list(csvfile.columns)) 
+                
+            # writing the data rows 
+            file_data = csvwriter.writerows(list(csvfile.values.tolist()))
+        
+        with open(filename,"rb") as f:
+                file_data = f.read()
+                file_name = f.name
+                msg.add_attachment(file_data,maintype="application",subtype="csv",filename=file_name)
+
+                server = smtplib.SMTP('smtp.gmail.com', 587)
+                server.starttls()
+                try:
+                    server.login(sender, password)
+                    server.send_message(msg)
+                    st.write("Email Sent Successfully!")
+                except smtplib.SMTPAuthenticationError:
+                    print("Unable to sign in")
+    else:
+        st.write("Number of Impacts and Weights should be equal!")
