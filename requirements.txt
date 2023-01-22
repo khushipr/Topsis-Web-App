@@ -1,0 +1,6 @@
+pandas
+streamlit
+math
+smtplib
+csv
+EmailMessage
