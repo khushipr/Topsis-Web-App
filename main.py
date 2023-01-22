@@ -128,6 +128,12 @@ msg = EmailMessage()
 msg['Subject'] = subject
 msg['From'] = sender
 msg['To'] = email
+message = """This is the result file of the input file provided by you after topsis calculation.
+Done By -
+Khushi Prasad
+102183044
+COE20
+"""
 filename = "results.csv"
 if submit is True:
     if(len(weights)==len(impacts)):
@@ -168,6 +174,7 @@ if submit is True:
         with open(filename,"rb") as f:
                 file_data = f.read()
                 file_name = f.name
+                msg.set_content(message)
                 msg.add_attachment(file_data,maintype="application",subtype="csv",filename=file_name)
 
                 server = smtplib.SMTP('smtp.gmail.com', 587)
